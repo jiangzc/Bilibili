@@ -2,6 +2,7 @@ import requests
 import json
 import rsa
 import base64
+import random
 
 
 def _rsa_encrypt(pubkey, hash, password):
@@ -78,10 +79,17 @@ class Bilibili(object):
                           })
         print('give 1 coin to aid:', aid, res.text)
 
+    def get_video(self):
+        res = self.session.get('http://api.bilibili.cn/recommend')
+        obj = json.loads(res.text)
+        L = [x['aid'] for x in obj['list']]
+        return L
+
 def main():
     user = Bilibili()
     user.loads('cookie.json')
-    user.give_coin('7319078')
+    L = user.get_video()
+    user.give_coin(L[random.randint(0, len(L))])
 
 
 if __name__ == '__main__':
