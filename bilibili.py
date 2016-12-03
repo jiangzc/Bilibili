@@ -26,13 +26,16 @@ class Bilibili(object):
         self.key = obj['key']
         self.hash = obj['hash']
 
-    def check_login(self):
+    def check_login(self, output=1):
+        self.session.get('http://www.bilibili.com/')
         cookies = self.session.cookies.get_dict()
         if 'DedeUserID' in cookies.keys():
-            print('isLogin = True, ID=', cookies['DedeUserID'])
+            if output:
+                print('isLogin = True, ID=', cookies['DedeUserID'])
             return True
         else:
-            print('isLogin = False')
+            if output:
+                print('isLogin = False')
             return False
 
     def dumps(self, filename):
@@ -64,10 +67,22 @@ class Bilibili(object):
                           })
         return self.check_login()
 
+    def give_coin(self, aid):
+        self.session.headers.update({'Referer': 'http://www.bilibili.com/video/av' + str(aid)})
+        res = self.session.post('http://www.bilibili.com/plus/comment.php',
+                          data={
+                              'aid': aid,
+                              'multiply': 1,
+                              'player': 1,
+                              'rating': 100
+                          })
+        print('give 1 coin to aid:', aid, res.text)
 
 def main():
     user = Bilibili()
     user.loads('cookie.json')
+    user.give_coin('7319078')
+
 
 if __name__ == '__main__':
     main()
