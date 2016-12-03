@@ -3,6 +3,8 @@ import json
 import rsa
 import base64
 import random
+import sys
+import os
 
 
 def _rsa_encrypt(pubkey, hash, password):
@@ -41,12 +43,14 @@ class Bilibili(object):
 
     def dumps(self, filename):
         print('dumping in file...')
+        filename = os.path.join(os.path.dirname(sys.argv[0]), filename)
         with open(filename, 'w') as f:
             cookie = self.session.cookies.get_dict()
             f.write(json.dumps(cookie))
 
     def loads(self, filename):
         print('loading from file...')
+        filename = os.path.join(os.path.dirname(sys.argv[0]), filename)
         with open(filename, 'r') as f:
             cookie = json.loads(f.read())
             self.session.cookies.update(cookie)
