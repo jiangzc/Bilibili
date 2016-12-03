@@ -3,6 +3,7 @@ import json
 import rsa
 import base64
 
+
 def _rsa_encrypt(pubkey, hash, password):
     pubkey = rsa.PublicKey.load_pkcs1_openssl_pem(pubkey)
     password = hash + password
@@ -52,8 +53,8 @@ class Bilibili(object):
         self._get_vcode()
         self._get_key()
         vcode = input('input vcode:')
-        self.session.post(url = 'https://passport.bilibili.com/login/dologin',
-                          data = {
+        self.session.post(url='https://passport.bilibili.com/login/dologin',
+                          data={
                               'act': 'login',
                               'gourl': 'https://passport.bilibili.com/login/dologin',
                               'keeptime': '2592000',
