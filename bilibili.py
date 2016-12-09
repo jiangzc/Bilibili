@@ -8,7 +8,7 @@ import os
 import time
 
 
-PATH = os.path.abspath(os.path.dirname(argv[0]))
+PATH = os.path.abspath(os.path.dirname(sys.argv[0]))
 
 def _rsa_encrypt(pubkey, hash, password):
     pubkey = rsa.PublicKey.load_pkcs1_openssl_pem(pubkey)
@@ -103,13 +103,14 @@ class Bilibili(object):
 
 def main():
     user = Bilibili()
+    #login
     if not user.loads('cookie.json'):
         user.login('末日V4', 'Q110110110')
         user.dumps('cookie.json')
+    #give corn
     L = user.get_video()
     user.give_coin(L[random.randint(0, len(L))])
     ###
-    user.session.get('http://www.bilibili.com/video/av' + str(L[3]))
     log(get_CN_time() + ' started')
 
 if __name__ == '__main__':
