@@ -5,12 +5,23 @@ import base64
 import random
 import sys
 import os
+import time
 
+
+PATH = os.path.abspath(os.path.dirname(argv[0]))
 
 def _rsa_encrypt(pubkey, hash, password):
     pubkey = rsa.PublicKey.load_pkcs1_openssl_pem(pubkey)
     password = hash + password
     return base64.b64encode(rsa.encrypt(password.encode('utf-8'), pubkey))
+
+def get_CN_time():
+    return time.asctime(time.gmtime(time.time() + 8 * 60 * 60))
+
+def log(string):
+    with open(os.path.join(PATH, 'log.txt'), 'a') as f:
+        f.write(string + '\r\n')
+
 
 class Bilibili(object):
 
@@ -43,19 +54,20 @@ class Bilibili(object):
 
     def dumps(self, filename):
         print('dumping in file...')
-        filename = os.path.join(os.path.dirname(sys.argv[0]), filename)
+        filename = os.path.join(PATH, filename)
         with open(filename, 'w') as f:
             cookie = self.session.cookies.get_dict()
             f.write(json.dumps(cookie))
 
     def loads(self, filename):
         print('loading from file...')
-        filename = os.path.join(os.path.dirname(sys.argv[0]), filename)
-        with open(filename, 'r') as f:
-            cookie = json.loads(f.read())
-            self.session.cookies.update(cookie)
-        self.check_login()
-
+        filename = os.path.join(PATH, filename)
+        try:
+            with open(filename, 'r') as f:
+                cookie = json.loads(f.read())
+                self.session.cookies.update(cookie)
+        finally:
+            return self.check_login()
 
     def login(self, userid, password):
         self._get_vcode()
@@ -91,10 +103,14 @@ class Bilibili(object):
 
 def main():
     user = Bilibili()
-    user.loads('cookie.json')
+    if not user.loads('cookie.json'):
+        user.login('末日V4', 'Q110110110')
+        user.dumps('cookie.json')
     L = user.get_video()
     user.give_coin(L[random.randint(0, len(L))])
-
+    ###
+    user.session.get('http://www.bilibili.com/video/av' + str(L[3]))
+    log(get_CN_time() + ' started')
 
 if __name__ == '__main__':
     main()
