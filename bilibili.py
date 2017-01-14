@@ -3,12 +3,21 @@ import json
 import rsa
 import base64
 import random
-import sys
-import os
 import time
+import builtins
+import os
 
 
-PATH = os.path.abspath(os.path.dirname(sys.argv[0]))
+_open = builtins.open
+
+def open1(file, mode, *args, **kwargs):
+    if "\\" in file or "/" in file:
+        pass
+    else:
+        file = os.path.join(".", file)
+    return _open(file, mode, *args, **kwargs)
+
+builtins.open = open1
 
 def _rsa_encrypt(pubkey, hash, password):
     pubkey = rsa.PublicKey.load_pkcs1_openssl_pem(pubkey)
@@ -19,7 +28,7 @@ def get_CN_time():
     return time.asctime(time.gmtime(time.time() + 8 * 60 * 60))
 
 def log(string):
-    with open(os.path.join(PATH, 'log.txt'), 'a') as f:
+    with open('log.txt', 'a') as f:
         f.write(string + '\r\n')
 
 
@@ -54,14 +63,12 @@ class Bilibili(object):
 
     def dumps(self, filename):
         print('dumping in file...')
-        filename = os.path.join(PATH, filename)
         with open(filename, 'w') as f:
             cookie = self.session.cookies.get_dict()
             f.write(json.dumps(cookie))
 
     def loads(self, filename):
         print('loading from file...')
-        filename = os.path.join(PATH, filename)
         try:
             with open(filename, 'r') as f:
                 cookie = json.loads(f.read())
