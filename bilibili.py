@@ -6,18 +6,19 @@ import random
 import time
 import builtins
 import os
+import sys
 
 
 _open = builtins.open
+PATH = os.path.abspath(os.path.dirname(sys.argv[0]))
 
-def open1(file, mode, *args, **kwargs):
+def open1(file, mode='r', *args, **kwargs):
     if "\\" in file or "/" in file:
         pass
     else:
-        file = os.path.join(".", file)
+        file = os.path.join(PATH, file)
     return _open(file, mode, *args, **kwargs)
 
-builtins.open = open1
 
 def _rsa_encrypt(pubkey, hash, password):
     pubkey = rsa.PublicKey.load_pkcs1_openssl_pem(pubkey)
@@ -28,7 +29,7 @@ def get_CN_time():
     return time.asctime(time.gmtime(time.time() + 8 * 60 * 60))
 
 def log(string):
-    with open('log.txt', 'a') as f:
+    with open1('log.txt', 'a') as f:
         f.write(string + '\r\n')
 
 
@@ -40,7 +41,7 @@ class Bilibili(object):
 
     def _get_vcode(self):
          res = self.session.get('https://passport.bilibili.com/captcha')
-         with open('vcode.png', 'wb') as f:
+         with open1('vcode.png', 'wb') as f:
              f.write(res.content)
 
     def _get_key(self):
@@ -63,14 +64,14 @@ class Bilibili(object):
 
     def dumps(self, filename):
         print('dumping in file...')
-        with open(filename, 'w') as f:
+        with open1(filename, 'w') as f:
             cookie = self.session.cookies.get_dict()
             f.write(json.dumps(cookie))
 
     def loads(self, filename):
         print('loading from file...')
         try:
-            with open(filename, 'r') as f:
+            with open1(filename, 'r') as f:
                 cookie = json.loads(f.read())
                 self.session.cookies.update(cookie)
         finally:
@@ -109,10 +110,11 @@ class Bilibili(object):
         return L
 
 def main():
+
     user = Bilibili()
     #login
     if not user.loads('cookie.json'):
-        user.login('末日V4', 'Q110110110')
+        user.login('username', 'password')
         user.dumps('cookie.json')
     #give corn
     L = user.get_video()

@@ -5,6 +5,8 @@
 
 -requests Lib
 
+-rsa Lib
+
 ##Initialize 初始化
 ```python
 user = Bilibili()
