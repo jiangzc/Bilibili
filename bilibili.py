@@ -4,20 +4,10 @@ import rsa
 import base64
 import random
 import time
-import builtins
 import os
+import sys
 
-
-_open = builtins.open
-
-def open1(file, mode, *args, **kwargs):
-    if "\\" in file or "/" in file:
-        pass
-    else:
-        file = os.path.join(".", file)
-    return _open(file, mode, *args, **kwargs)
-
-builtins.open = open1
+os.chdir(os.path.abspath(os.path.dirname(sys.argv[0])))
 
 def _rsa_encrypt(pubkey, hash, password):
     pubkey = rsa.PublicKey.load_pkcs1_openssl_pem(pubkey)
@@ -109,11 +99,13 @@ class Bilibili(object):
         return L
 
 def main():
+
     user = Bilibili()
     #login
     if not user.loads('cookie.json'):
-        user.login('末日V4', 'Q110110110')
-        user.dumps('cookie.json')
+        user.login('****', '****')
+        if user.check_login():
+            user.dumps('cookie.json')
     #give corn
     L = user.get_video()
     user.give_coin(L[random.randint(0, len(L))])
