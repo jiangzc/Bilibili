@@ -1,4 +1,7 @@
-# Login Bilibili
+﻿# Login Bilibili
+
+## Update
+B站登录系统更新，此项目处于不可用状态。
 
 ## Requirment
 -python3
